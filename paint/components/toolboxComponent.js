@@ -10,7 +10,7 @@ template.innerHTML = `
 position:absolute;
 	background:white;
 	box-shadow:0px 0px 0.5rem rgba(0,0,0,0.3);
-	padding:0.5rem !important;
+	padding:0rem !important;
 	font-weight:500;font-size:1rem;
 	border-radius:0.5rem;
 	display:flex;
@@ -19,6 +19,7 @@ position:absolute;
 	align-items:center;
 	gap:0.5rem;
 	flex-wrap: wrap;
+	transition:50ms all;
 }
 div{
 display:flex;
@@ -31,8 +32,9 @@ width:1px;
 background-color:lightgray;
 }
 button{
+padding:0.5rem;
 border:0;
-background: transparent;
+background:transparent;
 cursor:pointer;
 }
 </style>
@@ -57,12 +59,27 @@ class PaintToolbox extends HTMLElement{
 		shadowRoot.appendChild(templateContent.cloneNode(true))
 		// PLEASE MAKE THIS INTO A SINGLE COMPONENT
 		this.moveButton = shadowRoot.querySelector(".js-move-button")
-		this.moveButton.addEventListener("mouseenter",(event)=>this.moveToolbox(event))
-		this.moveButton.addEventListener("mousemove",(event)=>this.moveToolbox(event))
+		this.moveButton.addEventListener("mousedown",(event)=>this.moveToolbox(event))
+		this.moveButton.addEventListener("mouseup", (event)=>{
+			this.canMove = false;
+			this.moveToolbox(event);
+		})
+		this.moveButton.addEventListener("mouseenter", (event)=>{
+			this.canMove=true;
+			this.moveToolbox(event);
+		})
+
+		window.addEventListener("mousemove",(event)=>this.moveToolbox(event))
 	}
 	moveToolbox(event){
-		let pressed = (event.buttons & 1) === 1;
-		console.log(pressed)
+		const pressed = (event.buttons & 1) === 1;
+		const {x,y} = event;
+		const {width, height } = this.moveButton.getBoundingClientRect();
+		if(pressed && this.canMove){
+
+			this.style.left = x -(width/2) + 'px';
+			this.style.top = y - (height/2) + 'px';
+		}
 	}
 }
 
