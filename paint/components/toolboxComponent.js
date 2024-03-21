@@ -20,16 +20,18 @@ position:absolute;
 	gap:0.5rem;
 	flex-wrap: wrap;
 	transition:50ms all;
+
 }
 div{
 display:flex;
 flex-direction:row;
 flex-wrap:wrap;
-gap:0.5rem;
+justify-content: center;
 }
 separator{
 width:1px;
 background-color:lightgray;
+
 }
 button{
 padding:0.5rem;
@@ -39,6 +41,7 @@ cursor:pointer;
 }
 </style>
 <div>
+<slot></slot>
 <button class="js-move-button"><box-icon name='move' ></box-icon></button>
 <separator></separator>
 <button><box-icon name='eraser' ></box-icon></button>
