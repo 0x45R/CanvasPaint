@@ -7,6 +7,7 @@ template.innerHTML = `
 	box-sizing:border-box;
 }
 :host{
+	background-position:center;
 	background-image:url("/paint/img/transparent_grid.png");
 	background-repeat:repeat;
 	box-shadow:0px 0px 0.5rem rgba(0,0,0,0.3);
@@ -22,7 +23,6 @@ template.innerHTML = `
 	width:100%;
 	overflow:hidden;
 	position:relative;
-	background-position:center;
 	transition: background-size 300ms;
 }
 canvas{
@@ -32,7 +32,6 @@ box-shadow: 0px 0px 2rem rgba(0,0,0,0.75);
 transition: scale 300ms;
 position:absolute;
 cursor:crosshair;
-image-rendering:pixelated;
 }
 .info{
 position:absolute;
@@ -50,7 +49,8 @@ z-index:1;
 <canvas></canvas>
 `;
 let templateContent = template.content;
-
+const lerp = (a, b, n) => (1 - n) * a + n * b
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
 class PaintCanvas extends HTMLElement{
 	static observedAttributes = ["scale", "width", "height"];
 	constructor(){
@@ -59,10 +59,14 @@ class PaintCanvas extends HTMLElement{
 		shadowRoot.appendChild(templateContent.cloneNode(true))
 		this.strokeColor = "black"
 		this.strokeSize = 10
-		this.offset = {x:0,y:0}
+		this.canDraw = true
+		
+		this.host = shadowRoot.getRootNode().host
 		this.resolution = {x: 1920, y: 1080}
+		this.canvasSize = this.host.getBoundingClientRect()
+		const {width: canvasWidth, height: canvasHeight} = this.canvasSize
+	 	this.offset = {x:0,y:0}
 		this.scrollSensitivity = 0.0005;
-		this.setAttribute("scale",0.5)
 
 		this.canvas = shadowRoot.querySelector("canvas")
 		this.canvas.width = this.resolution.x
@@ -72,12 +76,12 @@ class PaintCanvas extends HTMLElement{
 
 		this.context = this.canvas.getContext('2d')
 
-		this.setAttribute("scale",0.5)
+		this.setAttribute("scale",0.8)
 		this.updateScale()
-
+		this.updateOffset()
 		this.canvas.addEventListener("mousemove", (event)=>this.canvasMouseMoved(event))
 		this.canvas.addEventListener("mousedown",(event)=>this.canvasMouseMoved(event))
-		window.addEventListener("mousedown", ()=>this.context.beginPath())
+		//window.addEventListener("mousedown", ()=>this.context.beginPath())
 		window.addEventListener("mouseup", ()=>this.context.closePath())
 		this.addEventListener("mousemove",(event)=>this.mouseMoved(event))
 		window.addEventListener("wheel", (event)=>this.wheelScrolled(event))
@@ -106,7 +110,7 @@ class PaintCanvas extends HTMLElement{
 	canvasMouseMoved(event){
 		const {offsetX:x,offsetY:y} = event
 	//this.context.moveTo(x,y)
-		if(event.buttons == 1){
+		if(event.buttons == 1 && this.canDraw){
 	
 			this.canvasStroke(event)
 		}else{
@@ -114,8 +118,23 @@ class PaintCanvas extends HTMLElement{
 			this.context.moveTo(x,y)
 		}
 	}
+	updateOffset(){
+		const {height,width} = this.canvas.getBoundingClientRect()
+		const {height : canvasHeight,  width: canvasWidth} = this.canvasSize
+		let left = (this.offset.x)
+		let top = (this.offset.y)
+		this.canvas.style.cursor = "move"
+		this.style.backgroundPosition = `${left}px ${top}px`
+		
+	 	//this.canvas.style.left = `${left-width-canvasWidth/2}px`
+		//this.canvas.style.top = `${top-height-canvasHeight/2}px`
+		this.canvas.style.translate = `${left}px ${top}px`
+		this.shadowRoot.querySelector(".offset_label").innerText = `${left}, ${top} offset`
+	}
 	mouseMoved(event)
 	{
+		let {offsetX, offsetY} = event
+	 	//this.canvas.style.transformOrigin = `${offsetX}px ${offsetY}px`
 		this.canvas.style.cursor = "crosshair"
 		if(event.buttons != 4) return
 		
@@ -124,12 +143,9 @@ class PaintCanvas extends HTMLElement{
 		let scale = this.getAttribute("scale")
 		this.offset.x += x
 		this.offset.y += y
-	
-		let left = (this.offset.x)
-		let top = (this.offset.y)
-		this.canvas.style.cursor = "move"
-		this.canvas.style.translate = `${left}px ${top}px`
-		this.shadowRoot.querySelector(".offset_label").innerText = `${left}, ${top} offset`
+
+
+		this.updateOffset()
 	
 
 	}
@@ -139,8 +155,7 @@ class PaintCanvas extends HTMLElement{
 		let value = Math.round(event.wheelDelta)*this.scrollSensitivity;
 		
 		let newValue = Math.round((scale+value)*100000)/100000
-		if(scale+value<=0) newValue = 0.001
-		if(scale+value>=10) newValue = 9.99
+		newValue = clamp(newValue,0.001,10)
 		
 		this.setAttribute("scale",newValue);
 	}

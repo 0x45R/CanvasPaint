@@ -43,8 +43,8 @@ cursor:pointer;
 
 <button class="js-move-button"><box-icon name='move' ></box-icon></button>
 <separator></separator>
-<button><box-icon name='eraser' ></box-icon></button>
-<button><box-icon name='paint'></box-icon></button>
+<button><box-icon name='eraser'></box-icon></button>
+<button><box-icon name='paint' type='solid'></box-icon></button>
 <paint-color-palette-tool></paint-color-palette-tool>
 <button><box-icon name='color-fill'></box-icon></button>
 <button><box-icon name='edit'></box-icon></button>
@@ -64,11 +64,13 @@ class PaintToolbox extends HTMLElement{
 		this.moveButton.addEventListener("mousedown",(event)=>this.moveToolbox(event))
 		this.moveButton.addEventListener("mouseup", (event)=>{
 			this.canMove = false;
+			this.getReference().canDraw = true
 		
 		})
 		this.moveButton.addEventListener("mouseenter", (event)=>{
 			this.canMove=true;
 			this.moveToolbox(event);
+			this.getReference().canDraw = false
 		})
 
 		window.addEventListener("mousemove",(event)=>this.moveToolbox(event))
