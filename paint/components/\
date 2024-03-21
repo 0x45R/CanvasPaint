@@ -9,7 +9,6 @@ template.innerHTML = `
 }
 :host{
 position:relative;
-
 }
 div{
 display:flex;
@@ -52,10 +51,9 @@ justify-content:end;
 max-height:0px;
 padding:0;
 }
-
 </style>
 
-<button class='js-palette-button'><box-icon class='palette-icon' name='palette' type='solid' color='black'></box-icon></button>
+<button box-icon class='js-palette-button' name='palette' type='solid' color='#c50202'></box-icon></button>
 <div class='color-palette-popup hidden'>
 
 </div>
@@ -85,9 +83,7 @@ class SelectColorTile extends HTMLElement{
 	clicked(){
 		let host = this.getRootNode().host
 		let reference = host.offsetParent.getReference()
-		let color =  this.getAttribute("color")
-		host.paletteIcon.setAttribute("color",color)
-		reference.strokeColor = color
+		reference.strokeColor = this.getAttribute("color")
 		console.log(reference)
 	}
 	attributeChangedCallback(){
@@ -104,7 +100,6 @@ class ColorPaletteTool extends HTMLElement{
 		const {host} = this.getRootNode()
 		this.reference = host.getReference()
 		console.log(this.reference)
-		this.paletteIcon = shadowRoot.querySelector(".palette-icon")
 		this.palettePopup = shadowRoot.querySelector(".color-palette-popup")
 		this.paletteButton = shadowRoot.querySelector(".js-palette-button")
 		this.paletteButton.addEventListener("click", ()=>{
