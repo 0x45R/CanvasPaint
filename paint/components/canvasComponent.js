@@ -81,7 +81,7 @@ class PaintCanvas extends HTMLElement{
 		this.updateOffset()
 		this.canvas.addEventListener("mousemove", (event)=>this.canvasMouseMoved(event))
 		this.canvas.addEventListener("mousedown",(event)=>this.canvasMouseMoved(event))
-		//window.addEventListener("mousedown", ()=>this.context.beginPath())
+		window.addEventListener("mousedown", ()=>this.context.beginPath())
 		window.addEventListener("mouseup", ()=>this.context.closePath())
 		this.addEventListener("mousemove",(event)=>this.mouseMoved(event))
 		window.addEventListener("wheel", (event)=>this.wheelScrolled(event))
