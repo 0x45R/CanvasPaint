@@ -31,6 +31,8 @@ background:white;
 box-shadow: 0px 0px 2rem rgba(0,0,0,0.75);
 transition: scale 300ms;
 position:absolute;
+cursor:crosshair;
+image-rendering:pixelated;
 }
 .info{
 position:absolute;
@@ -55,24 +57,66 @@ class PaintCanvas extends HTMLElement{
 		super();
 		const shadowRoot = this.attachShadow({mode: "open"})
 		shadowRoot.appendChild(templateContent.cloneNode(true))
-
+		this.strokeColor = "black"
+		this.strokeSize = 10
 		this.offset = {x:0,y:0}
 		this.resolution = {x: 1920, y: 1080}
 		this.scrollSensitivity = 0.0005;
 		this.setAttribute("scale",0.5)
 
 		this.canvas = shadowRoot.querySelector("canvas")
+		this.canvas.width = this.resolution.x
+		this.canvas.height = this.resolution.y
 		this.canvas.style.width = this.resolution.x+"px"
 		this.canvas.style.height = this.resolution.y+"px"
+
+		this.context = this.canvas.getContext('2d')
 
 		this.setAttribute("scale",0.5)
 		this.updateScale()
 
+		this.canvas.addEventListener("mousemove", (event)=>this.canvasMouseMoved(event))
+		this.canvas.addEventListener("mousedown",(event)=>this.canvasMouseMoved(event))
+		window.addEventListener("mousedown", ()=>this.context.beginPath())
+		window.addEventListener("mouseup", ()=>this.context.closePath())
 		this.addEventListener("mousemove",(event)=>this.mouseMoved(event))
 		window.addEventListener("wheel", (event)=>this.wheelScrolled(event))
+		document.addEventListener(
+		    "wheel",
+		    function touchHandler(e) {
+		      if (e.ctrlKey) {
+			e.preventDefault();
+		      }
+		    }, { passive: false } );
+	}
+	canvasStroke(event){
+		const {offsetX:x,offsetY:y} = event
+	//this.context.beginPath()
+		this.context.strokeStyle = this.strokeColor
+		console.log(this.strokeColor)
+		this.context.lineWidth = this.strokeSize
+		this.context.lineCap = 'round'
+		this.context.lineJoin = 'round'
+		this.context.lineTo(x,y)
+		this.context.stroke()
+	 //this.context.closePath()
+		this.context.moveTo(x,y)
+
+	}
+	canvasMouseMoved(event){
+		const {offsetX:x,offsetY:y} = event
+	//this.context.moveTo(x,y)
+		if(event.buttons == 1){
+	
+			this.canvasStroke(event)
+		}else{
+		
+			this.context.moveTo(x,y)
+		}
 	}
 	mouseMoved(event)
 	{
+		this.canvas.style.cursor = "crosshair"
 		if(event.buttons != 4) return
 		
 		let {movementX: x, movementY: y} = event
@@ -83,13 +127,14 @@ class PaintCanvas extends HTMLElement{
 	
 		let left = (this.offset.x)
 		let top = (this.offset.y)
-
+		this.canvas.style.cursor = "move"
 		this.canvas.style.translate = `${left}px ${top}px`
 		this.shadowRoot.querySelector(".offset_label").innerText = `${left}, ${top} offset`
 	
 
 	}
 	wheelScrolled(event){
+ 		if(!event.ctrlKey) return
 		let scale = parseFloat(this.getAttribute("scale"))
 		let value = Math.round(event.wheelDelta)*this.scrollSensitivity;
 		
