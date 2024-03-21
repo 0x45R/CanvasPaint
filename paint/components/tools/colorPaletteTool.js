@@ -45,6 +45,7 @@ display:flex;
 padding:0.25rem;
 gap:0.25rem;
 flex-direction:column;
+flex-wrap:nowrap;
 justify-content:end;
 }
 
