@@ -29,7 +29,8 @@ canvas{
 scale:0.5;
 background:white;
 box-shadow: 0px 0px 2rem rgba(0,0,0,0.75);
-transition: scale 300ms, translate 300ms;
+transition: scale 300ms;
+position:absolute;
 }
 .info{
 position:absolute;
@@ -42,6 +43,7 @@ z-index:1;
 <div class='info'>
 <p>Untitled</p>
 <p class='scale_label'>0.5 scale</p>
+<p class='offset_label'>0, 0 offset</p>
 </div>
 <canvas></canvas>
 `;
@@ -54,8 +56,9 @@ class PaintCanvas extends HTMLElement{
 		const shadowRoot = this.attachShadow({mode: "open"})
 		shadowRoot.appendChild(templateContent.cloneNode(true))
 
+		this.offset = {x:0,y:0}
 		this.resolution = {x: 1920, y: 1080}
-		this.scrollSensitivity = 0.0001;
+		this.scrollSensitivity = 0.0005;
 		this.setAttribute("scale",0.5)
 
 		this.canvas = shadowRoot.querySelector("canvas")
@@ -65,13 +68,26 @@ class PaintCanvas extends HTMLElement{
 		this.setAttribute("scale",0.5)
 		this.updateScale()
 
-		this.addEventListener("mousemove",(event)=>{
-			let {offsetX: x,offsetY: y} = event
-			let scale = this.getAttribute("scale")
-			let {width, height} = this.canvas.getBoundingClientRect()
-			//this.canvas.style.translate = `${x}px ${(y)}px`
-		})
+		this.addEventListener("mousemove",(event)=>this.mouseMoved(event))
 		window.addEventListener("wheel", (event)=>this.wheelScrolled(event))
+	}
+	mouseMoved(event)
+	{
+		if(event.buttons != 4) return
+		
+		let {movementX: x, movementY: y} = event
+	
+		let scale = this.getAttribute("scale")
+		this.offset.x += x
+		this.offset.y += y
+	
+		let left = (this.offset.x)
+		let top = (this.offset.y)
+
+		this.canvas.style.translate = `${left}px ${top}px`
+		this.shadowRoot.querySelector(".offset_label").innerText = `${left}, ${top} offset`
+	
+
 	}
 	wheelScrolled(event){
 		let scale = parseFloat(this.getAttribute("scale"))
