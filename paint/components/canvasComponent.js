@@ -26,12 +26,11 @@ template.innerHTML = `
 	transition: background-size 300ms;
 }
 canvas{
-scale:0.5;
 background:white;
 box-shadow: 0px 0px 2rem rgba(0,0,0,0.75);
-transition: scale 300ms;
 position:absolute;
 cursor:crosshair;
+transition: scale 300ms;
 }
 .info{
 position:absolute;
@@ -53,12 +52,18 @@ const lerp = (a, b, n) => (1 - n) * a + n * b
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
 class PaintCanvas extends HTMLElement{
 	static observedAttributes = ["scale", "width", "height"];
+	calculateInitialScale(){
+		const {width: x1, height: y1} = this.canvasSize
+		const {x: x2, y: y2} = this.resolution
+		const result = {x: x1/x2, y: y1/y2}
+		return Math.round(result.x*100-1)/100
+	}
 	constructor(){
 		super();
 		const shadowRoot = this.attachShadow({mode: "open"})
 		shadowRoot.appendChild(templateContent.cloneNode(true))
 		this.strokeColor = "black"
-		this.strokeSize = 10
+		this.strokeSize = 16
 		this.canDraw = true
 		
 		this.host = shadowRoot.getRootNode().host
@@ -66,7 +71,7 @@ class PaintCanvas extends HTMLElement{
 		this.canvasSize = this.host.getBoundingClientRect()
 		const {width: canvasWidth, height: canvasHeight} = this.canvasSize
 	 	this.offset = {x:0,y:0}
-		this.scrollSensitivity = 0.0005;
+		this.scrollSensitivity = 0.0001;
 
 		this.canvas = shadowRoot.querySelector("canvas")
 		this.canvas.width = this.resolution.x
@@ -76,7 +81,8 @@ class PaintCanvas extends HTMLElement{
 
 		this.context = this.canvas.getContext('2d')
 
-		this.setAttribute("scale",0.8)
+		const initialScale = this.calculateInitialScale()
+		this.setAttribute("scale",initialScale)
 		this.updateScale()
 		this.updateOffset()
 		this.canvas.addEventListener("mousemove", (event)=>this.canvasMouseMoved(event))
@@ -154,8 +160,8 @@ class PaintCanvas extends HTMLElement{
 		let scale = parseFloat(this.getAttribute("scale"))
 		let value = Math.round(event.wheelDelta)*this.scrollSensitivity;
 		
-		let newValue = Math.round((scale+value)*100000)/100000
-		newValue = clamp(newValue,0.001,10)
+		let newValue = Math.round((scale+value)*100)/100
+		newValue = clamp(newValue,0.01,10)
 		
 		this.setAttribute("scale",newValue);
 	}
