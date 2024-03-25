@@ -56,7 +56,10 @@ class PaintCanvas extends HTMLElement{
 		const {width: x1, height: y1} = this.canvasSize
 		const {x: x2, y: y2} = this.resolution
 		const result = {x: x1/x2, y: y1/y2}
-		return Math.round(result.x*100-1)/100
+		// Inspired by css vmin
+		let desired = (result.x < result.y) ? result.x : result.y
+
+		return Math.round(desired*100 - 5) /100 
 	}
 	constructor(){
 		super();
