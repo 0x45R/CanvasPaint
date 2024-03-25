@@ -46,7 +46,7 @@ bottom:50px;
 border-radius:0.25rem;
 box-shadow: 0px 0px 0.5rem rgba(0,0,0,0.3);
 transition: 100ms max-height;
-overflow-y:scroll;
+overflow-y:hidden;
 overflow-x:hidden;
 display:flex;
 padding:0.25rem;
