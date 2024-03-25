@@ -28,7 +28,7 @@ background: radial-gradient(black var(--size), white var(--size), white 100%);
 </style>
 `
 let tileTemplateContent = tileTemplate.content;
-class SelectBrushTile extends HTMLElement{
+class BrushStrokeSizeTile extends HTMLElement{
 	static observedAttributes = ["size"];
 	constructor(){
 		super();
@@ -50,7 +50,7 @@ class SelectBrushTile extends HTMLElement{
 	}
 }
 
-window.customElements.define("brush-stroke-size-tile", SelectBrushTile);
+window.customElements.define("brush-stroke-size-tile", BrushStrokeSizeTile);
 class BrushTool extends HTMLElement{
 	constructor(){
 		super();
