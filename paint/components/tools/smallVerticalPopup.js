@@ -37,6 +37,7 @@ align-items:center;
 justify-content:center;
 }
 .vertical-popup{
+margin:0 8;
 position:absolute;
 background:white;
 width:32px;
