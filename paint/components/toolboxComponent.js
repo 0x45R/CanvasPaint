@@ -1,4 +1,5 @@
-import * as test from "./tools/colorPaletteTool.js";
+import * as colorPaletteTool from "./tools/colorPaletteTool.js";
+import * as brushTool from "./tools/brushTool.js"
 let template = document.createElement("template");
 template.innerHTML = `
 <style>
@@ -44,7 +45,7 @@ cursor:pointer;
 <button class="js-move-button"><box-icon name='move' ></box-icon></button>
 <separator></separator>
 <button><box-icon name='eraser'></box-icon></button>
-<button><box-icon name='paint' type='solid'></box-icon></button>
+<brush-tool></brush-tool>
 <paint-color-palette-tool></paint-color-palette-tool>
 <button><box-icon name='color-fill'></box-icon></button>
 <button><box-icon name='edit'></box-icon></button>

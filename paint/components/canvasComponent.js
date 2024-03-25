@@ -8,7 +8,7 @@ template.innerHTML = `
 }
 :host{
 	background-position:center;
-	background-image:url("/paint/img/transparent_grid.png");
+	background-image:url("paint/img/transparent_grid.png");
 	background-repeat:repeat;
 	box-shadow:0px 0px 0.5rem rgba(0,0,0,0.3);
 	font-weight:500;font-size:1rem;
