@@ -21,7 +21,6 @@ position:absolute;
 	align-items:center;
 	gap:0rem;
 	flex-wrap: wrap;
-	transition:50ms all;
 
 display:flex;
 flex-direction:row;
